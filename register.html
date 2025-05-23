@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Регистрация - ShopManager</title>
+	<link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+	<div class="container auth-container">
+		<h1>Регистрация</h1>
+		<form id="registerForm">
+			<label for="email">Email</label>
+			<input type="email" id="email" required />
+
+			<label for="password">Пароль</label>
+			<input type="password" id="password" required minlength="6" />
+
+			<button type="submit">Зарегистрироваться</button>
+		</form>
+		<p>Уже есть аккаунт? <a href="login.html">Войти</a></p>
+		<div id="registerError" class="error-message"></div>
+	</div>
+
+	<script type="module" src="auth.js"></script>
+	<script type="module">
+		import { registerUser } from './auth.js';
+
+		const form = document.getElementById('registerForm');
+		const errorDiv = document.getElementById('registerError');
+
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			errorDiv.textContent = '';
+
+			const email = form.email.value.trim();
+			const password = form.password.value.trim();
+
+			try {
+				await registerUser(email, password);
+				alert('Регистрация прошла успешно! Войдите в аккаунт.');
+				window.location.href = 'login.html';
+			} catch (error) {
+				errorDiv.textContent = error.message;
+			}
+		});
+	</script>
+</body>
+
+</html>
