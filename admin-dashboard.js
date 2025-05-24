@@ -47,7 +47,7 @@ onAuthStateChanged(auth, async (user) => {
       <p><strong>Товар:</strong> ${order.product || 'Не указан'}</p>
       <p>
         <strong>Статус:</strong>
-        <select data-id="${docSnap.id}">
+        <select data-id="${docSnap.id}" data-path="${docSnap.ref.path}">
           <option value="В обработке" ${order.status === "В обработке" ? "selected" : ""}>В обработке</option>
           <option value="Отправлен" ${order.status === "Отправлен" ? "selected" : ""}>Отправлен</option>
           <option value="Доставлен" ${order.status === "Доставлен" ? "selected" : ""}>Доставлен</option>
@@ -61,9 +61,11 @@ onAuthStateChanged(auth, async (user) => {
   container.addEventListener("change", async (e) => {
     if (e.target.tagName === "SELECT") {
       const id = e.target.dataset.id;
+      const path = e.target.dataset.path;
       const newStatus = e.target.value;
       try {
-        await updateDoc(doc(db, "orders", id), { status: newStatus });
+        const orderRef = doc(db, path);
+        await updateDoc(orderRef, { status: newStatus });
         alert("Статус обновлён.");
       } catch (error) {
         alert("Ошибка при обновлении статуса: " + error.message);
