@@ -14,7 +14,7 @@ const userEmailSpan = document.getElementById('userEmail');
 const logoutBtn = document.getElementById('logoutBtn');
 
 logoutBtn.addEventListener('click', async () => {
-  await signOut();
+  await signOut(auth);
   window.location.href = 'login.html';
 });
 
