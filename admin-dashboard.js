@@ -1,14 +1,6 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-import {
-  collection,
-  collectionGroup,
-  getDocs,
-  doc,
-  updateDoc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
+import { collectionGroup, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
 const container = document.getElementById("ordersAdminContainer");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -40,9 +32,8 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  import { collectionGroup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
-const snapshot = await getDocs(collectionGroup(db, "orders"));
+  // Получаем все заказы из всех подколлекций 'orders'
+  const snapshot = await getDocs(collectionGroup(db, "orders"));
 
   container.innerHTML = "";
 
@@ -52,8 +43,8 @@ const snapshot = await getDocs(collectionGroup(db, "orders"));
     div.className = "adminOrderCard";
     div.innerHTML = `
       <h3>Заказ №${docSnap.id}</h3>
-      <p><strong>Email клиента:</strong> ${order.userEmail}</p>
-      <p><strong>Товар:</strong> ${order.product}</p>
+      <p><strong>Email клиента:</strong> ${order.userEmail || 'Не указан'}</p>
+      <p><strong>Товар:</strong> ${order.product || 'Не указан'}</p>
       <p>
         <strong>Статус:</strong>
         <select data-id="${docSnap.id}">
