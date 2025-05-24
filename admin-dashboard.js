@@ -32,7 +32,10 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const snapshot = await getDocs(collection(db, "orders"));
+  import { collectionGroup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+const snapshot = await getDocs(collectionGroup(db, "orders"));
+
   container.innerHTML = "";
 
   snapshot.forEach((docSnap) => {
