@@ -17,26 +17,32 @@ onAuthStateChanged(async user => {
   }
   userEmailSpan.textContent = user.email;
 
-  // Ссылка на подколлекцию заказов конкретного пользователя
-  const ordersRef = collection(db, 'clients', user.email, 'orders');
-  const snapshot = await getDocs(ordersRef);
-  ordersContainer.innerHTML = '';
+  try {
+    const ordersRef = collection(db, 'clients', user.email, 'orders');
+    const snapshot = await getDocs(ordersRef);
+    ordersContainer.innerHTML = '';
 
-  if(snapshot.empty){
-    ordersContainer.innerHTML = '<p>У вас пока нет заказов.</p>';
-    return;
+    console.log('Заказы пользователя:', snapshot.docs.map(doc => doc.id)); // Для отладки
+
+    if(snapshot.empty){
+      ordersContainer.innerHTML = '<p>У вас пока нет заказов.</p>';
+      return;
+    }
+
+    snapshot.forEach(docSnap => {
+      const order = docSnap.data();
+      const div = document.createElement('div');
+      div.className = 'order-card';
+      div.innerHTML = `
+        <h3>Заказ №${docSnap.id}</h3>
+        <p>Товар: ${order.product || 'не указано'}</p>
+        <p>Статус: <strong>${order.status || 'не указан'}</strong></p>
+        <p>Дата заказа: ${order.createdAt ? order.createdAt.toDate().toLocaleString() : 'не указана'}</p>
+      `;
+      ordersContainer.appendChild(div);
+    });
+  } catch (error) {
+    console.error('Ошибка загрузки заказов:', error);
+    ordersContainer.innerHTML = '<p>Ошибка при загрузке заказов.</p>';
   }
-
-  snapshot.forEach(docSnap => {
-    const order = docSnap.data();
-    const div = document.createElement('div');
-    div.className = 'order-card';
-    div.innerHTML = `
-      <h3>Заказ №${docSnap.id}</h3>
-      <p>Товар: ${order.product || 'не указано'}</p>
-      <p>Статус: <strong>${order.status || 'не указано'}</strong></p>
-      <p>Дата заказа: ${order.createdAt ? order.createdAt.toDate().toLocaleString() : 'не указано'}</p>
-    `;
-    ordersContainer.appendChild(div);
-  });
 });
