@@ -1,75 +1,51 @@
-import { auth, db } from './auth.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-import { collectionGroup, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+// admin-dashboard.js
+import { auth, db, signOut, onAuthStateChanged } from './auth.js';
+import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js';
 
-const container = document.getElementById("ordersAdminContainer");
-const logoutBtn = document.getElementById("logoutBtn");
+const ordersContainer = document.getElementById('ordersContainer');
+const userEmailSpan = document.getElementById('userEmail');
+const logoutBtn = document.getElementById('logoutBtn');
 
-logoutBtn.addEventListener("click", async () => {
-  await signOut(auth);
-  window.location.href = "login.html";
+logoutBtn.addEventListener('click', async () => {
+  await signOut();
+  window.location.href = 'login.html';
 });
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "login.html";
+    window.location.href = 'login.html';
     return;
   }
 
-  if (!user.email.includes("admin")) {
-    alert("Доступ запрещён");
-    await signOut(auth);
-    window.location.href = "login.html";
-    return;
-  }
+  userEmailSpan.textContent = user.email;
 
-  const subSnap = await getDoc(doc(db, "subscriptions", user.email));
-  const now = new Date();
-  if (!subSnap.exists() || !subSnap.data().active || subSnap.data().expiresAt.toDate() < now) {
-    alert("Доступ администратора ограничен. Подписка недействительна.");
-    await signOut(auth);
-    window.location.href = "subscribe.html";
-    return;
-  }
+  const ordersRef = collection(db, 'orders');
 
-  // Получаем все заказы из всех подколлекций 'orders'
-  const snapshot = await getDocs(collectionGroup(db, "orders"));
+  try {
+    const snapshot = await getDocs(ordersRef);
+    ordersContainer.innerHTML = '';
 
-  container.innerHTML = "";
-
-  snapshot.forEach((docSnap) => {
-    const order = docSnap.data();
-    const div = document.createElement("div");
-    div.className = "adminOrderCard";
-    div.innerHTML = `
-      <h3>Заказ №${docSnap.id}</h3>
-      <p><strong>Email клиента:</strong> ${order.userEmail || 'Не указан'}</p>
-      <p><strong>Товар:</strong> ${order.product || 'Не указан'}</p>
-      <p>
-        <strong>Статус:</strong>
-        <select data-id="${docSnap.id}" data-path="${docSnap.ref.path}">
-          <option value="В обработке" ${order.status === "В обработке" ? "selected" : ""}>В обработке</option>
-          <option value="Отправлен" ${order.status === "Отправлен" ? "selected" : ""}>Отправлен</option>
-          <option value="Доставлен" ${order.status === "Доставлен" ? "selected" : ""}>Доставлен</option>
-          <option value="Отменён" ${order.status === "Отменён" ? "selected" : ""}>Отменён</option>
-        </select>
-      </p>
-    `;
-    container.appendChild(div);
-  });
-
-  container.addEventListener("change", async (e) => {
-    if (e.target.tagName === "SELECT") {
-      const id = e.target.dataset.id;
-      const path = e.target.dataset.path;
-      const newStatus = e.target.value;
-      try {
-        const orderRef = doc(db, path);
-        await updateDoc(orderRef, { status: newStatus });
-        alert("Статус обновлён.");
-      } catch (error) {
-        alert("Ошибка при обновлении статуса: " + error.message);
-      }
+    if (snapshot.empty) {
+      ordersContainer.innerHTML = '<p>Заказов пока нет.</p>';
+      return;
     }
-  });
+
+    snapshot.forEach(docSnap => {
+      const order = docSnap.data();
+      const cleanProduct = order.product ? order.product.replace(/^"+|"+$/g, '') : 'Не указан';
+
+      const div = document.createElement('div');
+      div.className = 'order-card';
+      div.innerHTML = `
+        <h3>Заказ №${docSnap.id}</h3>
+        <p>Товар: ${cleanProduct}</p>
+        <p>Статус: <strong>${order.status || 'Ожидает обработки'}</strong></p>
+        <p>Дата заказа: ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
+      `;
+      ordersContainer.appendChild(div);
+    });
+  } catch (error) {
+    ordersContainer.innerHTML = `<p>Ошибка при загрузке заказов: ${error.message}</p>`;
+    console.error(error);
+  }
 });
