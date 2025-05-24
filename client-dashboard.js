@@ -1,13 +1,16 @@
 // client-dashboard.js
 
-import { auth, db, signOut } from './auth.js';
 import {
-  collection,
-  getDocs
+  auth,
+  db,
+  onAuthStateChanged,
+  signOut
+} from './auth.js';
+
+import {
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
 const ordersContainer = document.getElementById('ordersContainer');
 const userEmailSpan = document.getElementById('userEmail');
@@ -18,8 +21,7 @@ logoutBtn.addEventListener('click', async () => {
   window.location.href = 'login.html';
 });
 
-// ✅ Правильный способ использования onAuthStateChanged
-onAuthStateChanged(auth, async user => {
+onAuthStateChanged(async user => {
   if (!user) {
     window.location.href = 'login.html';
     return;
@@ -27,26 +29,43 @@ onAuthStateChanged(auth, async user => {
 
   userEmailSpan.textContent = user.email;
 
-  // Путь: clients/{email}/orders
-  const ordersRef = collection(db, 'clients', user.email, 'orders');
-  const snapshot = await getDocs(ordersRef);
-  ordersContainer.innerHTML = '';
+  try {
+    const ordersDocRef = doc(db, 'clients', user.email, 'orders', '1'); // Заказ №1
+    const orderSnap = await getDoc(ordersDocRef);
 
-  if (snapshot.empty) {
-    ordersContainer.innerHTML = '<p>У вас пока нет заказов.</p>';
-    return;
-  }
+    ordersContainer.innerHTML = '';
 
-  snapshot.forEach(docSnap => {
-    const order = docSnap.data();
+    if (!orderSnap.exists()) {
+      ordersContainer.innerHTML = '<p>У вас пока нет заказов.</p>';
+      return;
+    }
+
+    const order = orderSnap.data();
     const div = document.createElement('div');
     div.className = 'order-card';
+
+    const statusIcons = {
+      'в обработке': '🕓',
+      'отправлен': '📦',
+      'доставлен': '✅',
+      'отменён': '❌'
+    };
+
     div.innerHTML = `
-      <h3>Заказ №${docSnap.id}</h3>
-      <p>Товар: ${order.product || 'Не указан'}</p>
-      <p>Статус: <strong>${order.status || 'Ожидает обработки'}</strong></p>
-      <p>Дата заказа: ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
+      <div class="order-header">
+        <h3>Заказ №1</h3>
+        <span class="order-status">${statusIcons[order.status?.toLowerCase()] || ''} ${order.status}</span>
+      </div>
+      <p><strong>Товар:</strong> ${order.product || 'Не указан'}</p>
+      ${order.price ? `<p><strong>Цена:</strong> ${order.price}₴</p>` : ''}
+      ${order.address ? `<p><strong>Адрес:</strong> ${order.address}</p>` : ''}
+      <p><strong>Дата:</strong> ${order.createdAt?.toDate().toLocaleString() || 'Не указана'}</p>
     `;
+
     ordersContainer.appendChild(div);
-  });
+
+  } catch (error) {
+    console.error('Ошибка при загрузке заказа:', error);
+    ordersContainer.innerHTML = '<p>Ошибка загрузки заказов.</p>';
+  }
 });
