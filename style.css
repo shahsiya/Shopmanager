@@ -34,6 +34,7 @@ header h1 {
 	font-size: 1.5rem;
 	color: #2c3e50;
 }
+
 h1 {
 	font-size: 1.5rem;
 	font-weight: 600;
@@ -41,6 +42,7 @@ h1 {
 	text-align: center;
 	margin-bottom: 1.5rem;
 }
+
 header button {
 	background-color: #ff5c5c;
 	color: #fff;
@@ -104,24 +106,54 @@ button:hover {
 	background-color: #2980b9;
 }
 
-.adminOrderCard,
-.clientOrderCard {
+/* Карточка заказа */
+.order-card {
 	background-color: #fff;
-	padding: 1rem;
+	padding: 1.25rem 1.5rem;
 	border-radius: 8px;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.07);
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
+	gap: 0.6rem;
+	transition: box-shadow 0.3s ease;
 }
 
-select {
-	padding: 0.5rem;
-	border-radius: 6px;
-	border: 1px solid #ccc;
+.order-card:hover {
+	box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+}
+
+.order-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 0.6rem;
+}
+
+.order-header h3 {
+	color: #2c3e50;
+	font-weight: 700;
+	font-size: 1.3rem;
+}
+
+.order-status {
+	font-weight: 600;
 	font-size: 1rem;
+	color: #555;
+	background-color: #e0e7ff;
+	padding: 0.2rem 0.8rem;
+	border-radius: 12px;
+	user-select: none;
+	white-space: nowrap;
 }
 
+/* Текстовые поля заказа */
+.order-card p {
+	font-size: 1rem;
+	color: #444;
+	line-height: 1.3;
+}
+
+/* Адаптивность */
 @media (max-width: 600px) {
 	body {
 		padding: 1rem;
