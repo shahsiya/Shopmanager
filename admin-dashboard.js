@@ -1,6 +1,14 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-import { collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import {
+  collection,
+  collectionGroup,
+  getDocs,
+  doc,
+  updateDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
 
 const container = document.getElementById("ordersAdminContainer");
 const logoutBtn = document.getElementById("logoutBtn");
