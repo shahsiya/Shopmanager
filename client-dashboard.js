@@ -1,6 +1,6 @@
 // client-dashboard.js
 
-import { auth, db, signOut } from './auth.js';  // здесь импортируй свой auth.js с инициализацией Firebase и signOut
+import { auth, db, signOut } from './auth.js';
 import {
   collection,
   getDocs
@@ -26,9 +26,10 @@ onAuthStateChanged(auth, async user => {
 
   userEmailSpan.textContent = user.email;
 
-  // Используем user.uid для безопасности
-  const ordersRef = collection(db, 'clients', user.uid, 'orders');
-  
+  // Здесь используем user.email — если ты именно так хранишь документы,
+  // но рекомендую перейти на user.uid (см. ниже)
+  const ordersRef = collection(db, 'clients', user.email, 'orders');
+
   try {
     const snapshot = await getDocs(ordersRef);
     ordersContainer.innerHTML = '';
