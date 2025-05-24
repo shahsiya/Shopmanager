@@ -1,5 +1,5 @@
 import { auth, db, onAuthStateChanged, signOut } from './auth.js';
-import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
 const ordersContainer = document.getElementById('ordersContainer');
 const userEmailSpan = document.getElementById('userEmail');
@@ -17,7 +17,7 @@ onAuthStateChanged(async user => {
   }
   userEmailSpan.textContent = user.email;
 
-  // Получаем заказы клиента
+  // Ссылка на подколлекцию заказов конкретного пользователя
   const ordersRef = collection(db, 'clients', user.email, 'orders');
   const snapshot = await getDocs(ordersRef);
   ordersContainer.innerHTML = '';
@@ -33,9 +33,9 @@ onAuthStateChanged(async user => {
     div.className = 'order-card';
     div.innerHTML = `
       <h3>Заказ №${docSnap.id}</h3>
-      <p>Товар: ${order.product}</p>
-      <p>Статус: <strong>${order.status}</strong></p>
-      <p>Дата заказа: ${order.createdAt.toDate().toLocaleString()}</p>
+      <p>Товар: ${order.product || 'не указано'}</p>
+      <p>Статус: <strong>${order.status || 'не указано'}</strong></p>
+      <p>Дата заказа: ${order.createdAt ? order.createdAt.toDate().toLocaleString() : 'не указано'}</p>
     `;
     ordersContainer.appendChild(div);
   });
