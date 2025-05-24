@@ -1,61 +1,56 @@
-import { auth, db } from './firebase-config.js';
-import { collection, query, where, getDocs, orderBy } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js';
+// client-dashboard.js
+
+import { auth, db, signOut } from './auth.js';  // здесь импортируй свой auth.js с инициализацией Firebase и signOut
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
 const ordersContainer = document.getElementById('ordersContainer');
-const welcomeText = document.getElementById('welcomeText');
+const userEmailSpan = document.getElementById('userEmail');
 const logoutBtn = document.getElementById('logoutBtn');
 
-function formatDate(timestamp) {
-  const date = timestamp.toDate();
-  return date.toLocaleString('ru-RU', { 
-    day: '2-digit', month: '2-digit', year: 'numeric', 
-    hour: '2-digit', minute: '2-digit', second: '2-digit' 
-  });
-}
+logoutBtn.addEventListener('click', async () => {
+  await signOut();
+  window.location.href = 'login.html';
+});
 
-async function loadOrders(userId) {
-  const ordersRef = collection(db, 'users', userId, 'orders');
-  const q = query(ordersRef, orderBy('createdAt', 'desc'));
-  const querySnapshot = await getDocs(q);
-
-  ordersContainer.innerHTML = ''; // очистка перед загрузкой
-
-  if (querySnapshot.empty) {
-    ordersContainer.innerHTML = '<p>У вас пока нет заказов.</p>';
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    window.location.href = 'login.html';
     return;
   }
 
-  querySnapshot.forEach(doc => {
-    const order = doc.data();
+  userEmailSpan.textContent = user.email;
 
-    const orderDate = order.createdAt ? formatDate(order.createdAt) : 'Дата не указана';
-    const productName = order.productName || 'Не указан';
-    const status = order.status || 'Неизвестно';
+  // Используем user.uid для безопасности
+  const ordersRef = collection(db, 'clients', user.uid, 'orders');
+  
+  try {
+    const snapshot = await getDocs(ordersRef);
+    ordersContainer.innerHTML = '';
 
-    ordersContainer.innerHTML += `
-      <div class="order-card">
-        <div class="order-header">
-          <h3>Заказ №${doc.id}</h3>
-          <span class="order-status">${status}</span>
-        </div>
-        <p><strong>Товар:</strong> ${productName}</p>
-        <p><strong>Дата заказа:</strong> ${orderDate}</p>
-      </div>
-    `;
-  });
-}
+    if (snapshot.empty) {
+      ordersContainer.innerHTML = '<p>У вас пока нет заказов.</p>';
+      return;
+    }
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    welcomeText.textContent = `Добро пожаловать, ${user.email}`;
-    loadOrders(user.uid);
-  } else {
-    window.location.href = 'login.html'; // если не залогинен — редирект на вход
+    snapshot.forEach(docSnap => {
+      const order = docSnap.data();
+      const div = document.createElement('div');
+      div.className = 'order-card';
+      div.innerHTML = `
+        <h3>Заказ №${docSnap.id}</h3>
+        <p>Товар: ${order.product || 'Не указан'}</p>
+        <p>Статус: <strong>${order.status || 'Ожидает обработки'}</strong></p>
+        <p>Дата заказа: ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
+      `;
+      ordersContainer.appendChild(div);
+    });
+  } catch (error) {
+    ordersContainer.innerHTML = `<p>Ошибка при загрузке заказов: ${error.message}</p>`;
   }
-});
-
-logoutBtn.addEventListener('click', async () => {
-  await auth.signOut();
-  window.location.href = 'login.html';
 });
