@@ -1,73 +1,62 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Вход - ShopManager</title>
-	<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Вход — ShopManager</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-	<div class="container auth-container">
-		<h1>Вход</h1>
-		<form id="loginForm">
-			<label for="email">Email</label>
-			<input type="email" id="email" required />
+  <main>
+    <form id="loginForm">
+      <h1>Вход</h1>
+      <label for="email">Email</label>
+      <input type="email" id="email" required />
 
-			<label for="password">Пароль</label>
-			<input type="password" id="password" required minlength="6" />
+      <label for="password">Пароль</label>
+      <input type="password" id="password" required minlength="6" />
 
-			<button type="submit">Войти</button>
-		</form>
-		<p>Нет аккаунта? <a href="register.html">Зарегистрироваться</a></p>
-		<div id="loginError" class="error-message"></div>
-	</div>
+      <button type="submit">Войти</button>
+      <p>Нет аккаунта? <a href="register.html">Зарегистрироваться</a></p>
+      <div id="loginError" class="error-message"></div>
+    </form>
+  </main>
 
-	<script type="module" src="auth.js"></script>
-	<script type="module">
-		import { auth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from './auth.js';
+  <script type="module" src="auth.js"></script>
+  <script type="module">
+    import { auth, signInWithEmailAndPassword, onAuthStateChanged } from './auth.js';
 
-const form = document.getElementById('loginForm');
-const errorDiv = document.getElementById('loginError');
+    const form = document.getElementById('loginForm');
+    const errorDiv = document.getElementById('loginError');
 
-// Создаём функцию loginUser, чтобы не менять остальной код
-async function loginUser(email, password) {
-  return signInWithEmailAndPassword(auth, email, password);
-}
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorDiv.textContent = '';
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  errorDiv.textContent = '';
+      const email = form.email.value.trim();
+      const password = form.password.value.trim();
 
-  const email = form.email.value.trim();
-  const password = form.password.value.trim();
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        if (email.includes('admin')) {
+          window.location.href = 'admin-dashboard.html';
+        } else {
+          window.location.href = 'client-dashboard.html';
+        }
+      } catch (error) {
+        errorDiv.textContent = error.message;
+      }
+    });
 
-  try {
-    await loginUser(email, password);
-    // Перенаправление по email
-    if (email.includes('admin')) {
-      window.location.href = 'admin-dashboard.html';
-    } else {
-      window.location.href = 'client-dashboard.html';
-    }
-  } catch (error) {
-    errorDiv.textContent = error.message;
-  }
-});
-
-// Автоматический редирект, если уже залогинен
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    if (user.email.includes('admin')) {
-      window.location.href = 'admin-dashboard.html';
-    } else {
-      window.location.href = 'client-dashboard.html';
-    }
-  }
-});
-
-	</script>
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (user.email.includes('admin')) {
+          window.location.href = 'admin-dashboard.html';
+        } else {
+          window.location.href = 'client-dashboard.html';
+        }
+      }
+    });
+  </script>
 </body>
-
 </html>
