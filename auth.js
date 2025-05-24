@@ -1,44 +1,38 @@
 // auth.js
-import { auth, db } from "./firebase-config.js";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  onAuthStateChanged as firebaseOnAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
+// Инициализация Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import {
-  doc,
-  setDoc
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import {
+  getFirestore
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-// Регистрация пользователя
-export async function registerUser(email, password) {
-  const cred = await createUserWithEmailAndPassword(auth, email, password);
+// Твоя конфигурация Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBYSoT1yJgt0upA08gkeZoq-FLI0kmqjYk",
+  authDomain: "shopmanager-c9f0b.firebaseapp.com",
+  projectId: "shopmanager-c9f0b",
+  storageBucket: "shopmanager-c9f0b.appspot.com",
+  messagingSenderId: "1029319736818",
+  appId: "1:1029319736818:web:bbfb48553e318955ec3f6b"
+};
 
-  // После успешной регистрации создаем документ клиента в Firestore
-  const clientDoc = doc(db, "clients", email);
-  await setDoc(clientDoc, {
-    email,
-    createdAt: new Date().toISOString(),
-    role: email.includes("admin") ? "admin" : "client"
-  });
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  return cred;
-}
-
-// Вход пользователя
-export async function loginUser(email, password) {
-  const cred = await signInWithEmailAndPassword(auth, email, password);
-  return cred;
-}
-
-// Выход пользователя
-export async function signOut() {
-  await firebaseSignOut(auth);
-}
-
-// Отслеживание авторизации пользователя
-export function onAuthStateChanged(callback) {
-  firebaseOnAuthStateChanged(auth, callback);
-}
+// Экспорт нужных функций и переменных
+export {
+  auth,
+  db,
+  onAuthStateChanged,
+  signOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
+};
