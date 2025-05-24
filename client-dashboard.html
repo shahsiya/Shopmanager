@@ -1,27 +1,13 @@
-<!DOCTYPE html>
-<html lang="ru">
-
-<head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Личный кабинет - Клиент</title>
-	<link rel="stylesheet" href="style.css" />
-</head>
-
 <body>
-	<header>
-		<h1>Добро пожаловать, <span id="userEmail"></span></h1>
-		<button id="logoutBtn">Выйти</button>
-	</header>
-
-	<main>
-		<h2>Ваши заказы</h2>
-		<div id="ordersContainer" class="orders-container"></div>
-	</main>
-
-	<script type="module" src="client-dashboard.js"></script>
+  <header>
+    <h1>Личный кабинет</h1>
+    <button id="logoutBtn">Выйти</button>
+  </header>
+  <main>
+    <h2 id="welcomeText">Добро пожаловать</h2>
+    <section id="ordersContainer">
+      <!-- Заказы загрузятся сюда -->
+    </section>
+  </main>
+  <script type="module" src="client-dashboard.js"></script>
 </body>
-
-</html>
-
-
