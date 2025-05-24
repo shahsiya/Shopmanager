@@ -12,8 +12,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
-// ❗ Убедись, что возвращается именно getFirestore(app), а не что-то другое
 const auth = getAuth(app);
 const db = getFirestore(app);
 
