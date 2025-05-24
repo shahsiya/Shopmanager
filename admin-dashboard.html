@@ -2,25 +2,26 @@
 <html lang="ru">
 
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Админ Панель - ShopManager</title>
-	<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Админ Панель - ShopManager</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-	<header class="admin-header">
-		<h1>Панель администратора</h1>
-		<button id="logoutBtn" class="logout-button">Выйти</button>
-	</header>
+  <header>
+    <h1>Админ Панель</h1>
+    <button id="logoutBtn">Выйти</button>
+  </header>
 
-	<main>
-		<section id="ordersAdminContainer" class="orders-container">
-			<!-- Заказы будут подгружаться сюда -->
-		</section>
-	</main>
+  <main>
+    <div id="ordersContainer">
+      <h2>Все заказы клиентов</h2>
+      <p>Загрузка заказов...</p>
+    </div>
+  </main>
 
-	<script type="module" src="admin-dashboard.js"></script>
+  <script type="module" src="admin-dashboard.js"></script>
 </body>
 
 </html>
