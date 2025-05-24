@@ -1,10 +1,9 @@
-// firebase-config.js
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js';
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js';
 
 const firebaseConfig = {
-	apiKey: "AIzaSyBYSoT1yJgt0upA08gkeZoq-FLI0kmqjYk",
+  apiKey: "AIzaSyBYSoT1yJgt0upA08gkeZoq-FLI0kmqjYk",
   authDomain: "shopmanager-c9f0b.firebaseapp.com",
   projectId: "shopmanager-c9f0b",
   storageBucket: "shopmanager-c9f0b.appspot.com",
@@ -13,6 +12,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+// ❗ Убедись, что возвращается именно getFirestore(app), а не что-то другое
 const auth = getAuth(app);
 const db = getFirestore(app);
 
