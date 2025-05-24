@@ -1,5 +1,13 @@
-import { auth, db, onAuthStateChanged, signOut } from './auth.js';
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+// client-dashboard.js
+
+import { auth, db, signOut } from './auth.js';
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
 const ordersContainer = document.getElementById('ordersContainer');
 const userEmailSpan = document.getElementById('userEmail');
@@ -10,39 +18,35 @@ logoutBtn.addEventListener('click', async () => {
   window.location.href = 'login.html';
 });
 
-onAuthStateChanged(async user => {
+// ✅ Правильный способ использования onAuthStateChanged
+onAuthStateChanged(auth, async user => {
   if (!user) {
     window.location.href = 'login.html';
     return;
   }
+
   userEmailSpan.textContent = user.email;
 
-  try {
-    const ordersRef = collection(db, 'clients', user.email, 'orders');
-    const snapshot = await getDocs(ordersRef);
-    ordersContainer.innerHTML = '';
+  // Путь: clients/{email}/orders
+  const ordersRef = collection(db, 'clients', user.email, 'orders');
+  const snapshot = await getDocs(ordersRef);
+  ordersContainer.innerHTML = '';
 
-    console.log('Заказы пользователя:', snapshot.docs.map(doc => doc.id)); // Для отладки
-
-    if(snapshot.empty){
-      ordersContainer.innerHTML = '<p>У вас пока нет заказов.</p>';
-      return;
-    }
-
-    snapshot.forEach(docSnap => {
-      const order = docSnap.data();
-      const div = document.createElement('div');
-      div.className = 'order-card';
-      div.innerHTML = `
-        <h3>Заказ №${docSnap.id}</h3>
-        <p>Товар: ${order.product || 'не указано'}</p>
-        <p>Статус: <strong>${order.status || 'не указан'}</strong></p>
-        <p>Дата заказа: ${order.createdAt ? order.createdAt.toDate().toLocaleString() : 'не указана'}</p>
-      `;
-      ordersContainer.appendChild(div);
-    });
-  } catch (error) {
-    console.error('Ошибка загрузки заказов:', error);
-    ordersContainer.innerHTML = '<p>Ошибка при загрузке заказов.</p>';
+  if (snapshot.empty) {
+    ordersContainer.innerHTML = '<p>У вас пока нет заказов.</p>';
+    return;
   }
+
+  snapshot.forEach(docSnap => {
+    const order = docSnap.data();
+    const div = document.createElement('div');
+    div.className = 'order-card';
+    div.innerHTML = `
+      <h3>Заказ №${docSnap.id}</h3>
+      <p>Товар: ${order.product || 'Не указан'}</p>
+      <p>Статус: <strong>${order.status || 'Ожидает обработки'}</strong></p>
+      <p>Дата заказа: ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
+    `;
+    ordersContainer.appendChild(div);
+  });
 });
