@@ -57,7 +57,7 @@ async function loadAllOrders() {
         <p><b>Клиент:</b> ${order.clientEmail}</p>
        <p><b>Описание:</b> ${order.product || 'Нет данных'}</p>
        <p><b>Имя Клиента:</b> ${order.clientName || 'Нет данных'}</p>
-       <p><b>Адрес:</b> ${order.deliveryAdres || 'Нет данных'}</p>
+       <p>Адрес: ${order.deliveryAdres || 'Нет данных'}</p>
        p><b>Цена:</b> ${order.price || 'Нет данных'}</p>
         ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
       `;
