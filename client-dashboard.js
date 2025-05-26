@@ -40,7 +40,7 @@ onAuthStateChanged(auth, async (user) => {
         <h3>Заказ №${docSnap.id}</h3>
         <p>Товар: ${cleanProduct}</p>
         <p>Статус: <strong>${order.status || 'Ожидает обработки'}</strong></p>
-        <p>Дата заказа: ${order.createdAt?.toDate().toLocaleString() }</p>
+        <p>Дата заказа: ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
       `;
       ordersContainer.appendChild(div);
     });
