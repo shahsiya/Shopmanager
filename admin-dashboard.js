@@ -56,7 +56,7 @@ async function loadAllOrders() {
         </div>
         <p><b>Клиент:</b> ${order.clientEmail}</p>
         <p><b>Описание:</b> ${order.description || 'Нет данных'}</p>
-        <p><b>Дата:</b> ${order.date || 'Не указана'}</p>
+        <p><b>Дата:</b> ${order.createdAt || 'Не указана'}</p>
       `;
       ordersContainer.appendChild(div);
     });
