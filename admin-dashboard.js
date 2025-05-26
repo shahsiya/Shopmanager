@@ -55,7 +55,7 @@ async function loadAllOrders() {
           <span class="order-status">${order.status || 'Неизвестно'}</span>
         </div>
         <p><b>Клиент:</b> ${order.clientEmail}</p>
-       <p><b>Описание:</b> ${order.cleanProduct || 'Нет данных'}</p>
+       <p><b>Описание:</b> ${order.cleanProduct }</p>
         ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
       `;
       ordersContainer.appendChild(div);
