@@ -10,12 +10,18 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  serverTimestamp
+  serverTimestamp,
+  getDoc
 } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js';
 
 const ordersContainer = document.getElementById('ordersContainer');
 const logoutBtn = document.getElementById('logoutBtn');
 const addOrderForm = document.getElementById('addOrderForm');
+
+// Функция задержки
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // Авторизация
 onAuthStateChanged(auth, async user => {
@@ -23,6 +29,7 @@ onAuthStateChanged(auth, async user => {
   if (!user || !user.email.includes('admin')) {
     console.log('User отсутствует или не admin, делаем signOut и редирект на login');
     await signOut(auth);
+    await delay(2000);  // задержка 2 секунды
     window.location.href = 'login.html';
     return;
   }
@@ -46,6 +53,7 @@ onAuthStateChanged(auth, async user => {
     if (isSubscriptionExpired || isSubscriptionInactive) {
       alert('Ваша подписка неактивна или истекла.');
       await signOut(auth);
+      await delay(2000);  // задержка 2 секунды
       window.location.href = 'subscribe.html';
       return;
     }
@@ -56,11 +64,10 @@ onAuthStateChanged(auth, async user => {
   } catch (err) {
     console.error('Ошибка проверки подписки:', err);
     await signOut(auth);
+    await delay(2000);  // задержка 2 секунды
     window.location.href = 'subscribe.html';
   }
 });
-
-
 
 // Загрузка заказов
 async function loadAllOrders() {
