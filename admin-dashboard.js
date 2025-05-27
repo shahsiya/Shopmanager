@@ -31,19 +31,25 @@ onAuthStateChanged(auth, async user => {
     }
 
     const data = userDoc.data();
+
     const now = new Date();
     const endDate = data.subscriptionEnds?.toDate ? data.subscriptionEnds.toDate() : new Date(data.subscriptionEnds);
+    const isSubscriptionExpired = endDate && now > endDate;
+    const isSubscriptionInactive = data.subscriptionActive === false;
 
-    if (now > endDate) {
-      alert('Срок подписки истёк');
-      signOut(auth).then(() => window.location.href = 'subscribe.html');
+    if (isSubscriptionExpired || isSubscriptionInactive) {
+      alert('Ваша подписка неактивна или истекла.');
+      await signOut(auth);
+      window.location.href = 'subscribe.html';
       return;
     }
 
-    loadAllOrders();
+    loadAllOrders(); // Если всё нормально — загружаем админку
+
   } catch (err) {
     console.error('Ошибка проверки подписки:', err);
-    signOut(auth).then(() => window.location.href = 'subscribe.html');
+    await signOut(auth);
+    window.location.href = 'subscribe.html';
   }
 });
 
