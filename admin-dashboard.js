@@ -19,23 +19,29 @@ const addOrderForm = document.getElementById('addOrderForm');
 
 // Авторизация
 onAuthStateChanged(auth, async user => {
+  console.log('onAuthStateChanged, user:', user);
   if (!user || !user.email.includes('admin')) {
-    signOut(auth).then(() => window.location.href = 'login.html');
+    console.log('User отсутствует или не admin, делаем signOut и редирект на login');
+    await signOut(auth);
+    window.location.href = 'login.html';
     return;
   }
 
   try {
     const userDoc = await getDoc(doc(db, 'users', user.email));
+    console.log('Получен userDoc:', userDoc.exists());
     if (!userDoc.exists()) {
       throw new Error('Пользователь не найден');
     }
 
     const data = userDoc.data();
+    console.log('Данные пользователя:', data);
 
     const now = new Date();
     const endDate = data.subscriptionEnds?.toDate ? data.subscriptionEnds.toDate() : new Date(data.subscriptionEnds);
     const isSubscriptionExpired = endDate && now > endDate;
     const isSubscriptionInactive = data.subscriptionActive === false;
+    console.log('Проверка подписки:', { isSubscriptionExpired, isSubscriptionInactive });
 
     if (isSubscriptionExpired || isSubscriptionInactive) {
       alert('Ваша подписка неактивна или истекла.');
@@ -44,7 +50,8 @@ onAuthStateChanged(auth, async user => {
       return;
     }
 
-    loadAllOrders(); // Если всё нормально — загружаем админку
+    await loadAllOrders();
+    console.log('loadAllOrders завершён');
 
   } catch (err) {
     console.error('Ошибка проверки подписки:', err);
@@ -52,6 +59,7 @@ onAuthStateChanged(auth, async user => {
     window.location.href = 'subscribe.html';
   }
 });
+
 
 
 // Загрузка заказов
