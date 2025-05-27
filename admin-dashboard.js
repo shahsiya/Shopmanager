@@ -39,11 +39,11 @@ onAuthStateChanged(auth, async user => {
     const isSubscriptionInactive = data.subscriptionActive === false;
 
     if (isSubscriptionExpired || isSubscriptionInactive) {
-      alert('Ваша подписка неактивна или истекла.');
-      await signOut(auth);
-      window.location.href = 'subscribe.html';
-      return;
-    }
+  alert('Ваша подписка неактивна или истекла.');
+  window.location.href = 'subscribe.html';
+  return;
+}
+
 
     await loadAllOrders();
 
