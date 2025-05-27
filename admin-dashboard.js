@@ -1,14 +1,15 @@
 import { auth, db } from './firebase-config.js';
 import { signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js';
-import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js';
+import { collection, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js';
 
 const ordersContainer = document.getElementById('ordersContainer');
 const logoutBtn = document.getElementById('logoutBtn');
+const addOrderForm = document.getElementById('addOrderForm');
 
 // Проверка авторизации
 onAuthStateChanged(auth, user => {
   if (!user) {
-    window.location.href = 'login.html'; // редирект на вход, если не залогинен
+    window.location.href = 'login.html';
   } else {
     if (!user.email.includes('admin')) {
       alert('Доступ запрещён');
@@ -20,7 +21,7 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-// Функция загрузки всех заказов
+// Загрузка всех заказов
 async function loadAllOrders() {
   ordersContainer.innerHTML = '<h2>Все заказы клиентов</h2><p>Загрузка заказов...</p>';
   try {
@@ -55,11 +56,11 @@ async function loadAllOrders() {
           <span class="order-status">${order.status || 'Неизвестно'}</span>
         </div>
         <p><b>Клиент:</b> ${order.clientEmail}</p>
-       <p><b>Описание:</b> ${order.product || 'Нет данных'}</p>
-       <p><b>Имя Клиента:</b> ${order.clientName || 'Нет данных'}</p>
-       <p><b>Адрес:</b> ${order.deliveryAdres || 'Нет данных'}</p>
-       <p><b>Цена:</b> ${order.price || 'Нет данных'}</p>
-        ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
+        <p><b>Описание:</b> ${order.product || 'Нет данных'}</p>
+        <p><b>Имя Клиента:</b> ${order.clientName || 'Нет данных'}</p>
+        <p><b>Адрес:</b> ${order.deliveryAdres || 'Нет данных'}</p>
+        <p><b>Цена:</b> ${order.price || 'Нет данных'}</p>
+        <p><b>Дата создания:</b> ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
       `;
       ordersContainer.appendChild(div);
     });
@@ -68,9 +69,44 @@ async function loadAllOrders() {
   }
 }
 
-// Выход из системы
+// Выход
 logoutBtn.addEventListener('click', () => {
   signOut(auth).then(() => {
     window.location.href = 'login.html';
   });
+});
+
+// Добавление заказа вручную
+addOrderForm.addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const email = document.getElementById('clientEmail').value.trim();
+  const clientName = document.getElementById('clientName').value.trim();
+  const adres = document.getElementById('deliveryAdres').value.trim();
+  const product = document.getElementById('product').value.trim();
+  const price = document.getElementById('price').value.trim();
+
+  if (!email) {
+    alert('Введите email клиента');
+    return;
+  }
+
+  try {
+    const ordersRef = collection(db, 'clients', email, 'orders');
+    await addDoc(ordersRef, {
+      clientName,
+      deliveryAdres: adres,
+      product,
+      price,
+      status: 'Новый',
+      createdAt: serverTimestamp()
+    });
+
+    alert('Заказ успешно добавлен');
+    addOrderForm.reset();
+    loadAllOrders();
+  } catch (error) {
+    console.error('Ошибка при добавлении заказа:', error);
+    alert('Не удалось добавить заказ: ' + error.message);
+  }
 });
