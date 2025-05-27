@@ -92,7 +92,7 @@ input[type="text"] {
 }
 
 button {
-	background-color: #4ba989;
+	background-color: #3498db;
 	color: #fff;
 	border: none;
 	padding: 0.75rem;
@@ -103,7 +103,7 @@ button {
 }
 
 button:hover {
-	background-color: #3d9477;
+	background-color: #2980b9;
 }
 
 /* Карточка заказа */
