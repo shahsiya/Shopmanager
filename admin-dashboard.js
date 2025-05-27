@@ -81,14 +81,14 @@ addOrderForm.addEventListener('submit', async e => {
   e.preventDefault();
 
   const email = document.getElementById('clientEmail').value.trim();
-  const clientName = document.getElementById('clientName').value.trim();
-  const adres = document.getElementById('deliveryAdres').value.trim();
   const product = document.getElementById('product').value.trim();
+  const clientName = document.getElementById('clientName').value.trim();
+  const deliveryAdres = document.getElementById('deliveryAdres').value.trim();
   const price = document.getElementById('price').value.trim();
-  const statusInput = document.getElementById('status').value.trim() || 'Новый';
+  const status = document.getElementById('status').value.trim() || 'Новый';
 
-  if (!email) {
-    alert('Введите email клиента');
+  if (!email || !product) {
+    alert('Пожалуйста, заполните Email и описание товара');
     return;
   }
 
@@ -96,18 +96,17 @@ addOrderForm.addEventListener('submit', async e => {
     const ordersRef = collection(db, 'clients', email, 'orders');
     await addDoc(ordersRef, {
       clientName,
-      deliveryAdres: adres,
+      deliveryAdres,
       product,
       price,
-      status: statusInput,
+      status,
       createdAt: serverTimestamp()
     });
 
     alert('Заказ успешно добавлен');
     addOrderForm.reset();
-    loadAllOrders();
+    loadAllOrders();  // если есть такая функция для обновления списка
   } catch (error) {
-    console.error('Ошибка при добавлении заказа:', error);
-    alert('Не удалось добавить заказ: ' + error.message);
+    alert('Ошибка при добавлении заказа: ' + error.message);
   }
 });
