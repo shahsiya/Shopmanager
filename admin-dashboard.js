@@ -29,13 +29,12 @@ onAuthStateChanged(auth, async user => {
   if (!user || !user.email.includes('admin')) {
     console.log('User отсутствует или не admin, делаем signOut и редирект на login');
     await signOut(auth);
-    await delay(2000);  // задержка 2 секунды
     window.location.href = 'login.html';
     return;
   }
 
   try {
-    const userDoc = await getDoc(doc(db, 'users', user.email));
+    const userDoc = await getDoc(doc(db, 'clients', user.email)); // <-- здесь clients вместо users
     console.log('Получен userDoc:', userDoc.exists());
     if (!userDoc.exists()) {
       throw new Error('Пользователь не найден');
@@ -53,7 +52,6 @@ onAuthStateChanged(auth, async user => {
     if (isSubscriptionExpired || isSubscriptionInactive) {
       alert('Ваша подписка неактивна или истекла.');
       await signOut(auth);
-      await delay(2000);  // задержка 2 секунды
       window.location.href = 'subscribe.html';
       return;
     }
@@ -64,10 +62,10 @@ onAuthStateChanged(auth, async user => {
   } catch (err) {
     console.error('Ошибка проверки подписки:', err);
     await signOut(auth);
-    await delay(2000);  // задержка 2 секунды
     window.location.href = 'subscribe.html';
   }
 });
+
 
 // Загрузка заказов
 async function loadAllOrders() {
