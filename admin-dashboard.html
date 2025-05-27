@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Админ Панель - ShopManager</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
   <header>
     <h1>Админ Панель</h1>
@@ -15,6 +13,16 @@
   </header>
 
   <main>
+    <form id="addOrderForm">
+      <h2>Добавить заказ вручную</h2>
+      <input type="email" id="clientEmail" placeholder="Email клиента" required />
+      <input type="text" id="clientName" placeholder="Имя клиента" />
+      <input type="text" id="deliveryAdres" placeholder="Адрес доставки" />
+      <input type="text" id="product" placeholder="Продукт / Описание" />
+      <input type="text" id="price" placeholder="Цена" />
+      <button type="submit">Добавить заказ</button>
+    </form>
+
     <div id="ordersContainer">
       <h2>Все заказы клиентов</h2>
       <p>Загрузка заказов...</p>
@@ -23,5 +31,4 @@
 
   <script type="module" src="admin-dashboard.js"></script>
 </body>
-
 </html>
