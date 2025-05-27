@@ -50,18 +50,23 @@ async function loadAllOrders() {
     allOrders.forEach(order => {
       const div = document.createElement('div');
       div.className = 'order-card';
-      div.innerHTML = `
-        <div class="order-header">
-          <h3>Заказ: ${order.id}</h3>
-          <span class="order-status">${order.status || 'Неизвестно'}</span>
-        </div>
-        <p><b>Клиент:</b> ${order.clientEmail}</p>
-        <p><b>Описание:</b> ${order.product || 'Нет данных'}</p>
-        <p><b>Имя Клиента:</b> ${order.clientName || 'Нет данных'}</p>
-        <p><b>Адрес:</b> ${order.deliveryAdres || 'Нет данных'}</p>
-        <p><b>Цена:</b> ${order.price || 'Нет данных'}</p>
-        <p><b>Дата создания:</b> ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
-      `;
+    div.innerHTML = `
+  <div class="order-header">
+    <h3>Заказ: ${order.id}</h3>
+    <span class="order-status">${order.status || 'Неизвестно'}</span>
+  </div>
+  <p><b>Клиент:</b> ${order.clientEmail}</p>
+  <p><b>Описание:</b> ${order.product || 'Нет данных'}</p>
+  <p><b>Имя Клиента:</b> ${order.clientName || 'Нет данных'}</p>
+  <p><b>Адрес:</b> ${order.deliveryAdres || 'Нет данных'}</p>
+  <p><b>Цена:</b> ${order.price || 'Нет данных'}</p>
+  <p><b>Дата создания:</b> ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
+
+  <input type="text" placeholder="Новый статус" id="statusInput-${order.id}" />
+  <button data-action="update" data-id="${order.id}" data-email="${order.clientEmail}">Изменить статус</button>
+  <button data-action="delete" data-id="${order.id}" data-email="${order.clientEmail}">Удалить заказ</button>
+`;
+
       ordersContainer.appendChild(div);
     });
   } catch (error) {
