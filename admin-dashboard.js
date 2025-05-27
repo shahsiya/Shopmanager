@@ -86,8 +86,11 @@ async function loadAllOrders() {
     <button data-action="update" data-id="${order.id}" data-email="${order.clientEmail}">Обновить статус</button>
     <button data-action="delete" data-id="${order.id}" data-email="${order.clientEmail}">Удалить заказ</button>
   </div>
+  <div style="margin-top: 8px;">
+    <input id="trackingInput-${order.id}" type="text" value="${order.trackingNumber || ''}" placeholder="Введите трек номер" />
+    <button data-action="updateTracking" data-id="${order.id}" data-email="${order.clientEmail}">Обновить трек номер</button>
+  </div>
 `;
-
       ordersContainer.appendChild(div);
     });
   } catch (err) {
@@ -106,6 +109,7 @@ addOrderForm.addEventListener('submit', async e => {
   const product = formData.get('product');
   const price = formData.get('price');
   const status = formData.get('status') || 'Новый';
+  const trackingNumber = formData.get('trackingNumber') || '';
 
   try {
     const orderRef = collection(db, 'clients', email, 'orders');
@@ -115,6 +119,7 @@ addOrderForm.addEventListener('submit', async e => {
       product,
       price,
       status,
+      trackingNumber,
       createdAt: serverTimestamp()
     });
     alert('Заказ добавлен');
@@ -146,6 +151,20 @@ ordersContainer.addEventListener('click', async (e) => {
       loadAllOrders();
     } catch (err) {
       alert('Ошибка обновления');
+      console.error(err);
+    }
+  }
+
+  if (action === 'updateTracking') {
+    const input = document.getElementById(`trackingInput-${orderId}`);
+    const newTracking = input?.value.trim();
+    if (!newTracking) return alert('Введите трек номер');
+    try {
+      await updateDoc(orderRef, { trackingNumber: newTracking });
+      alert('Трек номер обновлён');
+      loadAllOrders();
+    } catch (err) {
+      alert('Ошибка обновления трек номера');
       console.error(err);
     }
   }
