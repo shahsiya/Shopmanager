@@ -20,29 +20,23 @@ const addOrderForm = document.getElementById('addOrderForm');
 
 // Авторизация
 onAuthStateChanged(auth, async user => {
-  console.log('onAuthStateChanged, user:', user);
   if (!user || !user.email.includes('admin')) {
-    console.log('User отсутствует или не admin, делаем signOut и редирект на login');
     await signOut(auth);
     window.location.href = 'login.html';
     return;
   }
 
   try {
-    const userDoc = await getDoc(doc(db, 'clients', user.email)); // <-- здесь clients вместо users
-    console.log('Получен userDoc:', userDoc.exists());
+    const userDoc = await getDoc(doc(db, 'clients', user.email));
     if (!userDoc.exists()) {
       throw new Error('Пользователь не найден');
     }
 
     const data = userDoc.data();
-    console.log('Данные пользователя:', data);
-
     const now = new Date();
     const endDate = data.subscriptionEnds?.toDate ? data.subscriptionEnds.toDate() : new Date(data.subscriptionEnds);
     const isSubscriptionExpired = endDate && now > endDate;
     const isSubscriptionInactive = data.subscriptionActive === false;
-    console.log('Проверка подписки:', { isSubscriptionExpired, isSubscriptionInactive });
 
     if (isSubscriptionExpired || isSubscriptionInactive) {
       alert('Ваша подписка неактивна или истекла.');
@@ -52,7 +46,6 @@ onAuthStateChanged(auth, async user => {
     }
 
     await loadAllOrders();
-    console.log('loadAllOrders завершён');
 
   } catch (err) {
     console.error('Ошибка проверки подписки:', err);
@@ -60,7 +53,6 @@ onAuthStateChanged(auth, async user => {
     window.location.href = 'subscribe.html';
   }
 });
-
 
 // Загрузка заказов
 async function loadAllOrders() {
@@ -92,39 +84,39 @@ async function loadAllOrders() {
       const div = document.createElement('div');
       div.className = 'order-card';
       div.innerHTML = `
-  <div class="order-header" style="position: relative; padding-right: 120px;">
-    <h3>Заказ: ${order.id}</h3>
-    <span class="order-status" style="
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: #28a745;
-      color: white;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.9em;
-      font-weight: 600;
-      text-transform: capitalize;
-    ">
-      ${order.status || 'Неизвестно'}
-    </span>
-  </div>
-  <p><b>Клиент:</b> ${order.clientEmail}</p>
-  <p><b>Описание:</b> ${order.product || 'Нет данных'}</p>
-  <p><b>Имя Клиента:</b> ${order.clientName || 'Нет данных'}</p>
-  <p><b>Адрес:</b> ${order.deliveryAdres || 'Нет данных'}</p>
-  <p><b>Цена:</b> ${order.price || 'Нет данных'}</p>
-  <p><b>Дата создания:</b> ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
-  <div>
-    <input id="statusInput-${order.id}" type="text" value="${order.status || ''}" placeholder="Обновить статус" />
-    <button data-action="update" data-id="${order.id}" data-email="${order.clientEmail}">Обновить статус</button>
-    <button data-action="delete" data-id="${order.id}" data-email="${order.clientEmail}">Удалить заказ</button>
-  </div>
-  <div style="margin-top: 8px;">
-    <input id="trackingInput-${order.id}" type="text" value="${order.trackingNumber || ''}" placeholder="Введите трек номер" />
-    <button data-action="updateTracking" data-id="${order.id}" data-email="${order.clientEmail}">Обновить трек номер</button>
-  </div>
-`;
+        <div class="order-header" style="position: relative; padding-right: 120px;">
+          <h3>Заказ: ${order.id}</h3>
+          <span class="order-status" style="
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #28a745;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: capitalize;
+          ">
+            ${order.status || 'Неизвестно'}
+          </span>
+        </div>
+        <p><b>Клиент:</b> ${order.clientEmail}</p>
+        <p><b>Описание:</b> ${order.product || 'Нет данных'}</p>
+        <p><b>Имя Клиента:</b> ${order.clientName || 'Нет данных'}</p>
+        <p><b>Адрес:</b> ${order.deliveryAdres || 'Нет данных'}</p>
+        <p><b>Цена:</b> ${order.price || 'Нет данных'}</p>
+        <p><b>Дата создания:</b> ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
+        <div>
+          <input id="statusInput-${order.id}" type="text" value="${order.status || ''}" placeholder="Обновить статус" />
+          <button data-action="update" data-id="${order.id}" data-email="${order.clientEmail}">Обновить статус</button>
+          <button data-action="delete" data-id="${order.id}" data-email="${order.clientEmail}">Удалить заказ</button>
+        </div>
+        <div style="margin-top: 8px;">
+          <input id="trackingInput-${order.id}" type="text" value="${order.trackingNumber || ''}" placeholder="Введите трек номер" />
+          <button data-action="updateTracking" data-id="${order.id}" data-email="${order.clientEmail}">Обновить трек номер</button>
+        </div>
+      `;
       ordersContainer.appendChild(div);
     });
   } catch (err) {
