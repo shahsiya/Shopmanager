@@ -18,15 +18,35 @@ const logoutBtn = document.getElementById('logoutBtn');
 const addOrderForm = document.getElementById('addOrderForm');
 
 // Авторизация
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
   if (!user || !user.email.includes('admin')) {
-    signOut(auth).then(() => {
-      window.location.href = 'login.html';
-    });
-  } else {
+    signOut(auth).then(() => window.location.href = 'login.html');
+    return;
+  }
+
+  try {
+    const userDoc = await getDoc(doc(db, 'users', user.email));
+    if (!userDoc.exists()) {
+      throw new Error('Пользователь не найден');
+    }
+
+    const data = userDoc.data();
+    const now = new Date();
+    const endDate = data.subscriptionEnds?.toDate ? data.subscriptionEnds.toDate() : new Date(data.subscriptionEnds);
+
+    if (now > endDate) {
+      alert('Срок подписки истёк');
+      signOut(auth).then(() => window.location.href = 'subscribe.html');
+      return;
+    }
+
     loadAllOrders();
+  } catch (err) {
+    console.error('Ошибка проверки подписки:', err);
+    signOut(auth).then(() => window.location.href = 'subscribe.html');
   }
 });
+
 
 // Загрузка заказов
 async function loadAllOrders() {
