@@ -1,40 +1,46 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Админ Панель - ShopManager</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Панель администратора</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .order-card {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+    }
+    .order-card input { margin-top: 8px; display: block; }
+    .order-card button {
+      margin-right: 10px;
+      margin-top: 6px;
+    }
+  </style>
 </head>
-
 <body>
-  <header>
-    <h1>Админ Панель</h1>
-    <button id="logoutBtn">Выйти</button>
-  </header>
 
-  <main>
-   <form id="addOrderForm">
-  <h2>Добавить заказ вручную</h2>
-  <input id="clientEmail" type="email" name="email" placeholder="Email клиента" required />
-  <input id="product" type="text" name="product" placeholder="Описание товара" required />
-  <input id="clientName" type="text" name="clientName" placeholder="Имя клиента" />
-  <input id="deliveryAdres" type="text" name="deliveryAdres" placeholder="Адрес доставки" />
-  <input id="price" type="text" name="price" placeholder="Цена" />
-  <input id="status" type="text" name="status" placeholder="Статус (например: обработан)" />
-  <button type="submit">Добавить заказ</button>
-</form>
+  <h1>Панель администратора</h1>
+  <button id="logoutBtn">Выйти</button>
 
+  <hr>
 
+  <h2>Добавить заказ</h2>
+  <form id="addOrderForm">
+    <input type="email" name="email" placeholder="Email клиента" required />
+    <input type="text" name="clientName" placeholder="Имя клиента" required />
+    <input type="text" name="deliveryAdres" placeholder="Адрес доставки" required />
+    <input type="text" name="product" placeholder="Продукт" required />
+    <input type="text" name="price" placeholder="Цена" required />
+    <input type="text" name="status" placeholder="Статус (необязательно)" />
+    <button type="submit">Добавить заказ</button>
+  </form>
 
-    <div id="ordersContainer">
-      <h2>Все заказы клиентов</h2>
-      <p>Загрузка заказов...</p>
-    </div>
-  </main>
+  <hr>
 
+  <div id="ordersContainer"></div>
+
+  <!-- Скрипты -->
   <script type="module" src="admin-dashboard.js"></script>
 </body>
-
 </html>
