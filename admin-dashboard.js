@@ -58,16 +58,36 @@ async function loadAllOrders() {
       const div = document.createElement('div');
       div.className = 'order-card';
       div.innerHTML = `
-        <p><b>ID:</b> ${order.id}</p>
-        <p><b>Клиент:</b> ${order.clientEmail}</p>
-        <p><b>Продукт:</b> ${order.product}</p>
-        <p><b>Имя:</b> ${order.clientName}</p>
-        <p><b>Адрес:</b> ${order.deliveryAdres}</p>
-        <p><b>Цена:</b> ${order.price}</p>
-        <p><b>Статус:</b> <input type="text" id="statusInput-${order.id}" value="${order.status || ''}" /></p>
-        <button data-action="update" data-id="${order.id}" data-email="${order.clientEmail}">Обновить статус</button>
-        <button data-action="delete" data-id="${order.id}" data-email="${order.clientEmail}">Удалить</button>
-      `;
+  <div class="order-header" style="position: relative; padding-right: 120px;">
+    <h3>Заказ: ${order.id}</h3>
+    <span class="order-status" style="
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: #28a745;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.9em;
+      font-weight: 600;
+      text-transform: capitalize;
+    ">
+      ${order.status || 'Неизвестно'}
+    </span>
+  </div>
+  <p><b>Клиент:</b> ${order.clientEmail}</p>
+  <p><b>Описание:</b> ${order.product || 'Нет данных'}</p>
+  <p><b>Имя Клиента:</b> ${order.clientName || 'Нет данных'}</p>
+  <p><b>Адрес:</b> ${order.deliveryAdres || 'Нет данных'}</p>
+  <p><b>Цена:</b> ${order.price || 'Нет данных'}</p>
+  <p><b>Дата создания:</b> ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
+  <div>
+    <input id="statusInput-${order.id}" type="text" value="${order.status || ''}" placeholder="Обновить статус" />
+    <button data-action="update" data-id="${order.id}" data-email="${order.clientEmail}">Обновить статус</button>
+    <button data-action="delete" data-id="${order.id}" data-email="${order.clientEmail}">Удалить заказ</button>
+  </div>
+`;
+
       ordersContainer.appendChild(div);
     });
   } catch (err) {
