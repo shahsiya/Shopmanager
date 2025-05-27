@@ -41,9 +41,24 @@ onAuthStateChanged(auth, async (user) => {
         <p>Товар: ${cleanProduct}</p>
         <p>Статус: <strong>${order.status || 'Ожидает обработки'}</strong></p>
         <p>Дата заказа: ${order.createdAt?.toDate().toLocaleString() || 'Неизвестно'}</p>
+        ${order.trackingNumber ? `<p class="tracking">Трек-номер: <span class="tracking-number" title="Нажмите для копирования">${order.trackingNumber}</span></p>` : ''}
       `;
       ordersContainer.appendChild(div);
     });
+
+    // Обработчик копирования трек-номера по клику
+    ordersContainer.addEventListener('click', (e) => {
+      if (e.target.classList.contains('tracking-number')) {
+        const text = e.target.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          e.target.title = 'Скопировано!';
+          setTimeout(() => {
+            e.target.title = 'Нажмите для копирования';
+          }, 1500);
+        });
+      }
+    });
+
   } catch (error) {
     ordersContainer.innerHTML = `<p>Ошибка при загрузке заказов: ${error.message}</p>`;
     console.error(error);
