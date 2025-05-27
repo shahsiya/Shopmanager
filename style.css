@@ -165,3 +165,19 @@ button:hover {
 		gap: 0.5rem;
 	}
 }
+.tracking {
+  font-size: 1rem;
+  color: #2c3e50;
+}
+
+.tracking-number {
+  font-weight: 600;
+  color: #1d72b8;
+  cursor: pointer;
+  border-bottom: 1px dashed #1d72b8;
+  transition: color 0.2s;
+}
+
+.tracking-number:hover {
+  color: #155a8a;
+}
