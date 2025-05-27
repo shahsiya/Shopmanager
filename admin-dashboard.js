@@ -85,6 +85,7 @@ addOrderForm.addEventListener('submit', async e => {
   const adres = document.getElementById('deliveryAdres').value.trim();
   const product = document.getElementById('product').value.trim();
   const price = document.getElementById('price').value.trim();
+  const statusInput = document.getElementById('status').value.trim() || 'Новый';
 
   if (!email) {
     alert('Введите email клиента');
@@ -98,7 +99,7 @@ addOrderForm.addEventListener('submit', async e => {
       deliveryAdres: adres,
       product,
       price,
-      status: 'Новый',
+      status: statusInput,
       createdAt: serverTimestamp()
     });
 
