@@ -18,11 +18,6 @@ const ordersContainer = document.getElementById('ordersContainer');
 const logoutBtn = document.getElementById('logoutBtn');
 const addOrderForm = document.getElementById('addOrderForm');
 
-// Функция задержки
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 // Авторизация
 onAuthStateChanged(auth, async user => {
   console.log('onAuthStateChanged, user:', user);
