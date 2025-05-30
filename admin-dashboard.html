@@ -24,22 +24,25 @@
       <button type="submit">Добавить заказ</button>
     </form>
 
+    <!-- 🔽 Новый блок для управления товарами -->
+    <section>
+      <h2>Управление товарами</h2>
+      <form id="addProductForm">
+        <input type="text" id="productTitle" placeholder="Название товара" required />
+        <input type="text" id="productDescription" placeholder="Описание товара" required />
+        <input type="text" id="productPrice" placeholder="Цена товара" required />
+        <button type="submit">Добавить товар</button>
+      </form>
+
+      <div id="productList">
+        <p>Загрузка товаров...</p>
+      </div>
+    </section>
+
     <div id="ordersContainer">
       <h2>Все заказы клиентов</h2>
       <p>Загрузка заказов...</p>
     </div>
-
-    <section>
-      <h2>Управление товарами</h2>
-      <form id="productForm">
-        <input type="hidden" name="productId" id="productId" />
-        <input type="text" name="name" id="productName" placeholder="Название товара" required />
-        <textarea name="description" id="productDescription" placeholder="Описание" required></textarea>
-        <input type="number" name="price" id="productPrice" placeholder="Цена" required />
-        <button type="submit">Сохранить</button>
-      </form>
-      <div id="productsContainer"></div>
-    </section>
   </main>
 
   <script type="module" src="admin-dashboard.js"></script>
