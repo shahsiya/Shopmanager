@@ -1,40 +1,47 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Админ Панель - ShopManager</title>
-	<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Админ Панель - ShopManager</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-	<header>
-		<h1>Админ Панель</h1>
-		<button id="logoutBtn">Выйти</button>
-	</header>
+  <header>
+    <h1>Админ Панель</h1>
+    <button id="logoutBtn">Выйти</button>
+  </header>
 
-	<main>
-		<form id="addOrderForm">
-			<h2>Добавить заказ вручную</h2>
-			<input id="clientEmail" type="email" name="email" placeholder="Email клиента" required />
-			<input id="product" type="text" name="product" placeholder="Описание товара" required />
-			<input id="clientName" type="text" name="clientName" placeholder="Имя клиента" />
-			<input id="deliveryAdres" type="text" name="deliveryAdres" placeholder="Адрес доставки" />
-			<input id="price" type="text" name="price" placeholder="Цена" />
-			<input id="status" type="text" name="status" placeholder="Статус (например: обработан)" />
-			<button type="submit">Добавить заказ</button>
-		</form>
+  <main>
+    <form id="addOrderForm">
+      <h2>Добавить заказ вручную</h2>
+      <input id="clientEmail" type="email" name="email" placeholder="Email клиента" required />
+      <input id="product" type="text" name="product" placeholder="Описание товара" required />
+      <input id="clientName" type="text" name="clientName" placeholder="Имя клиента" />
+      <input id="deliveryAdres" type="text" name="deliveryAdres" placeholder="Адрес доставки" />
+      <input id="price" type="text" name="price" placeholder="Цена" />
+      <input id="status" type="text" name="status" placeholder="Статус (например: обработан)" />
+      <button type="submit">Добавить заказ</button>
+    </form>
 
+    <div id="ordersContainer">
+      <h2>Все заказы клиентов</h2>
+      <p>Загрузка заказов...</p>
+    </div>
 
+    <section>
+      <h2>Управление товарами</h2>
+      <form id="productForm">
+        <input type="hidden" name="productId" id="productId" />
+        <input type="text" name="name" id="productName" placeholder="Название товара" required />
+        <textarea name="description" id="productDescription" placeholder="Описание" required></textarea>
+        <input type="number" name="price" id="productPrice" placeholder="Цена" required />
+        <button type="submit">Сохранить</button>
+      </form>
+      <div id="productsContainer"></div>
+    </section>
+  </main>
 
-		<div id="ordersContainer">
-			<h2>Все заказы клиентов</h2>
-			<p>Загрузка заказов...</p>
-		</div>
-	</main>
-
-	<script type="module" src="admin-dashboard.js"></script>
+  <script type="module" src="admin-dashboard.js"></script>
 </body>
-
 </html>
