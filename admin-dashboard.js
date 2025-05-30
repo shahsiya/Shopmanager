@@ -18,117 +18,9 @@ const ordersContainer = document.getElementById('ordersContainer');
 const logoutBtn = document.getElementById('logoutBtn');
 const addOrderForm = document.getElementById('addOrderForm');
 
-// ======== Новое для товаров ========
-const productsContainerId = 'productsContainer';
-
-// Функция для загрузки товаров
-async function loadProducts() {
-  let container = document.getElementById(productsContainerId);
-  if (!container) {
-    container = document.createElement('div');
-    container.id = productsContainerId;
-    container.innerHTML = `<h2>Управление товарами</h2>
-      <form id="addProductForm">
-        <input id="productName" type="text" placeholder="Название товара" required />
-        <input id="productPrice" type="number" placeholder="Цена" required />
-        <button type="submit">Добавить товар</button>
-      </form>
-      <div id="productsList"></div>
-    `;
-    ordersContainer.parentNode.insertBefore(container, ordersContainer.nextSibling);
-  }
-
-  const productsList = container.querySelector('#productsList');
-  productsList.innerHTML = '<p>Загрузка товаров...</p>';
-
-  try {
-    const productsSnapshot = await getDocs(collection(db, 'products'));
-    if (productsSnapshot.empty) {
-      productsList.innerHTML = '<p>Товары не найдены</p>';
-      return;
-    }
-
-    productsList.innerHTML = '';
-    productsSnapshot.forEach(docSnap => {
-      const p = docSnap.data();
-      const div = document.createElement('div');
-      div.className = 'product-card';
-      div.innerHTML = `
-        <b>${p.name}</b> — ${p.price} ₽
-        <button data-action="edit" data-id="${docSnap.id}">Редактировать</button>
-        <button data-action="delete" data-id="${docSnap.id}">Удалить</button>
-      `;
-      productsList.appendChild(div);
-    });
-
-  } catch (error) {
-    productsList.innerHTML = `<p>Ошибка загрузки товаров: ${error.message}</p>`;
-  }
-}
-
-// Обработка добавления товара
-async function onAddProduct(e) {
-  e.preventDefault();
-  const nameInput = document.getElementById('productName');
-  const priceInput = document.getElementById('productPrice');
-  const name = nameInput.value.trim();
-  const price = parseFloat(priceInput.value);
-
-  if (!name || isNaN(price) || price <= 0) {
-    alert('Введите корректное название и цену товара');
-    return;
-  }
-
-  try {
-    await addDoc(collection(db, 'products'), { name, price });
-    alert('Товар добавлен');
-    nameInput.value = '';
-    priceInput.value = '';
-    await loadProducts();
-  } catch (error) {
-    alert('Ошибка добавления товара');
-    console.error(error);
-  }
-}
-
-// Обработка кликов по товарам (редактирование/удаление)
-async function onProductsListClick(e) {
-  const target = e.target;
-  if (!target.dataset.action) return;
-
-  const action = target.dataset.action;
-  const id = target.dataset.id;
-  const productRef = doc(db, 'products', id);
-
-  if (action === 'delete') {
-    if (!confirm('Удалить товар?')) return;
-    try {
-      await deleteDoc(productRef);
-      alert('Товар удалён');
-      await loadProducts();
-    } catch (err) {
-      alert('Ошибка удаления товара');
-      console.error(err);
-    }
-  } else if (action === 'edit') {
-    const newName = prompt('Введите новое название товара');
-    if (!newName) return alert('Название не может быть пустым');
-    const newPriceStr = prompt('Введите новую цену товара');
-    const newPrice = parseFloat(newPriceStr);
-    if (isNaN(newPrice) || newPrice <= 0) return alert('Некорректная цена');
-
-    try {
-      await updateDoc(productRef, { name: newName, price: newPrice });
-      alert('Товар обновлён');
-      await loadProducts();
-    } catch (err) {
-      alert('Ошибка обновления товара');
-      console.error(err);
-    }
-  }
-}
-
-// ======== Существующий код авторизации и заказов (твой оригинальный) ========
+let allOrders = [];
+let currentPage = 1;
+const ordersPerPage = 10;
 
 // Авторизация
 onAuthStateChanged(auth, async user => {
@@ -157,7 +49,6 @@ onAuthStateChanged(auth, async user => {
     }
 
     await loadAllOrders();
-    await loadProducts(); // загружаем товары после заказов
 
   } catch (err) {
     console.error('Ошибка проверки подписки:', err);
@@ -166,11 +57,7 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
-// Загрузка заказов (без изменений)
-let allOrders = [];
-let currentPage = 1;
-const ordersPerPage = 10;
-
+// Загрузка заказов
 async function loadAllOrders() {
   ordersContainer.innerHTML = '<h2>Загрузка заказов...</h2>';
   try {
@@ -198,6 +85,7 @@ async function loadAllOrders() {
   }
 }
 
+// Отображение с пагинацией
 function renderOrders() {
   ordersContainer.innerHTML = '';
   const startIndex = (currentPage - 1) * ordersPerPage;
@@ -312,7 +200,7 @@ addOrderForm.addEventListener('submit', async e => {
   }
 });
 
-// Обработка обновления и удаления заказов
+// Обработка обновления и удаления
 ordersContainer.addEventListener('click', async (e) => {
   const target = e.target;
   const action = target.dataset.action;
