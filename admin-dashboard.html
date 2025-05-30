@@ -3,47 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Админ Панель - ShopManager</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Админка</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+      background: #f9f9f9;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+    .order-card, .product-card {
+      background: #fff;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+    }
+    button {
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    input[type="text"], input[type="number"] {
+      padding: 6px 8px;
+      margin-right: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1em;
+      width: 200px;
+    }
+    form > input, form > button {
+      margin-bottom: 10px;
+    }
+    #logoutBtn {
+      background: #d9534f;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      float: right;
+      margin-top: -40px;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Админ Панель</h1>
-    <button id="logoutBtn">Выйти</button>
-  </header>
 
-  <main>
+  <button id="logoutBtn">Выйти</button>
+  <h1>Панель администратора</h1>
+
+  <!-- Форма добавления заказа -->
+  <section>
+    <h2>Добавить заказ</h2>
     <form id="addOrderForm">
-      <h2>Добавить заказ вручную</h2>
-      <input id="clientEmail" type="email" name="email" placeholder="Email клиента" required />
-      <input id="product" type="text" name="product" placeholder="Описание товара" required />
-      <input id="clientName" type="text" name="clientName" placeholder="Имя клиента" />
-      <input id="deliveryAdres" type="text" name="deliveryAdres" placeholder="Адрес доставки" />
-      <input id="price" type="text" name="price" placeholder="Цена" />
-      <input id="status" type="text" name="status" placeholder="Статус (например: обработан)" />
+      <input name="email" type="email" placeholder="Email клиента" required />
+      <input name="clientName" type="text" placeholder="Имя клиента" required />
+      <input name="deliveryAdres" type="text" placeholder="Адрес доставки" required />
+      <input name="product" type="text" placeholder="Описание товара" required />
+      <input name="price" type="number" placeholder="Цена" required />
+      <input name="status" type="text" placeholder="Статус заказа" />
+      <input name="trackingNumber" type="text" placeholder="Трек номер" />
       <button type="submit">Добавить заказ</button>
     </form>
+  </section>
 
-    <!-- 🔽 Новый блок для управления товарами -->
-    <section>
-      <h2>Управление товарами</h2>
-      <form id="addProductForm">
-        <input type="text" id="productTitle" placeholder="Название товара" required />
-        <input type="text" id="productDescription" placeholder="Описание товара" required />
-        <input type="text" id="productPrice" placeholder="Цена товара" required />
-        <button type="submit">Добавить товар</button>
-      </form>
+  <!-- Контейнер для заказов -->
+  <section id="ordersContainer">
+    <!-- Заказы будут подгружаться сюда -->
+  </section>
 
-      <div id="productList">
-        <p>Загрузка товаров...</p>
-      </div>
-    </section>
-
-    <div id="ordersContainer">
-      <h2>Все заказы клиентов</h2>
-      <p>Загрузка заказов...</p>
-    </div>
-  </main>
+  <!-- Контейнер для товаров (создаётся динамически через JS после заказов) -->
 
   <script type="module" src="admin-dashboard.js"></script>
 </body>
