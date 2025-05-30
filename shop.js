@@ -8,12 +8,12 @@ import {
 
 // 🔧 Настройки Firebase
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBYSoT1yJgt0upA08gkeZoq-FLI0kmqjYk",
+  authDomain: "shopmanager-c9f0b.firebaseapp.com",
+  projectId: "shopmanager-c9f0b",
+  storageBucket: "shopmanager-c9f0b.appspot.com",
+  messagingSenderId: "1029319736818",
+  appId: "1:1029319736818:web:bbfb48553e318955ec3f6b
 };
 
 const app = initializeApp(firebaseConfig);
