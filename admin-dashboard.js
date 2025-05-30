@@ -18,6 +18,9 @@ const ordersContainer = document.getElementById('ordersContainer');
 const logoutBtn = document.getElementById('logoutBtn');
 const addOrderForm = document.getElementById('addOrderForm');
 
+const productForm = document.getElementById('productForm');
+const productsContainer = document.getElementById('productsContainer');
+
 let allOrders = [];
 let currentPage = 1;
 const ordersPerPage = 10;
@@ -49,6 +52,7 @@ onAuthStateChanged(auth, async user => {
     }
 
     await loadAllOrders();
+    await loadProducts();
 
   } catch (err) {
     console.error('Ошибка проверки подписки:', err);
@@ -85,7 +89,6 @@ async function loadAllOrders() {
   }
 }
 
-// Отображение с пагинацией
 function renderOrders() {
   ordersContainer.innerHTML = '';
   const startIndex = (currentPage - 1) * ordersPerPage;
@@ -141,7 +144,6 @@ function renderOrders() {
     ordersContainer.appendChild(div);
   });
 
-  // Кнопки пагинации
   const paginationDiv = document.createElement('div');
   paginationDiv.style.marginTop = '20px';
 
@@ -200,7 +202,7 @@ addOrderForm.addEventListener('submit', async e => {
   }
 });
 
-// Обработка обновления и удаления
+// Обработка заказов
 ordersContainer.addEventListener('click', async (e) => {
   const target = e.target;
   const action = target.dataset.action;
@@ -246,6 +248,101 @@ ordersContainer.addEventListener('click', async (e) => {
       loadAllOrders();
     } catch (err) {
       alert('Ошибка удаления');
+      console.error(err);
+    }
+  }
+});
+
+// === Управление товарами ===
+
+// Загрузка товаров
+async function loadProducts() {
+  productsContainer.innerHTML = '<p>Загрузка товаров...</p>';
+  try {
+    const productsRef = collection(db, 'products');
+    const snapshot = await getDocs(productsRef);
+    productsContainer.innerHTML = '';
+
+    snapshot.forEach(docSnap => {
+      const product = docSnap.data();
+      const div = document.createElement('div');
+      div.className = 'product-card';
+      div.innerHTML = `
+        <h3>${product.name}</h3>
+        <p>${product.description}</p>
+        <p><b>Цена:</b> ${product.price}</p>
+        <button data-action="editProduct" data-id="${docSnap.id}">Редактировать</button>
+        <button data-action="deleteProduct" data-id="${docSnap.id}">Удалить</button>
+      `;
+      productsContainer.appendChild(div);
+    });
+  } catch (err) {
+    productsContainer.innerHTML = '<p>Ошибка загрузки товаров</p>';
+    console.error(err);
+  }
+}
+
+// Обработка отправки формы товара
+productForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(productForm);
+  const name = formData.get('name');
+  const description = formData.get('description');
+  const price = formData.get('price');
+  const productId = formData.get('productId');
+
+  try {
+    if (productId) {
+      const ref = doc(db, 'products', productId);
+      await updateDoc(ref, { name, description, price });
+      alert('Товар обновлён');
+    } else {
+      await addDoc(collection(db, 'products'), {
+        name,
+        description,
+        price,
+        createdAt: serverTimestamp()
+      });
+      alert('Товар добавлен');
+    }
+    productForm.reset();
+    loadProducts();
+  } catch (err) {
+    alert('Ошибка при сохранении товара');
+    console.error(err);
+  }
+});
+
+// Обработка кнопок товара
+productsContainer.addEventListener('click', async (e) => {
+  const action = e.target.dataset.action;
+  const id = e.target.dataset.id;
+  if (!action || !id) return;
+
+  const ref = doc(db, 'products', id);
+
+  if (action === 'deleteProduct') {
+    if (!confirm('Удалить товар?')) return;
+    try {
+      await deleteDoc(ref);
+      alert('Удалено');
+      loadProducts();
+    } catch (err) {
+      alert('Ошибка удаления');
+      console.error(err);
+    }
+  }
+
+  if (action === 'editProduct') {
+    try {
+      const snap = await getDoc(ref);
+      const data = snap.data();
+      document.getElementById('productName').value = data.name;
+      document.getElementById('productDescription').value = data.description;
+      document.getElementById('productPrice').value = data.price;
+      document.getElementById('productId').value = id;
+    } catch (err) {
+      alert('Ошибка загрузки товара');
       console.error(err);
     }
   }
