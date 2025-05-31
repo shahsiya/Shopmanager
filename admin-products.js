@@ -1,6 +1,5 @@
 import { auth, db } from './firebase-config.js';
 import {
-  getAuth,
   signOut,
   onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js';
@@ -9,6 +8,7 @@ import {
   getDocs,
   addDoc,
   doc,
+  getDoc,
   updateDoc,
   deleteDoc,
   serverTimestamp
@@ -22,7 +22,7 @@ const cancelBtn = document.getElementById('cancelBtn');
 
 let editId = null;
 
-// Авторизация: пускаем только админа (как в admin-dashboard)
+// 1. Авторизация
 onAuthStateChanged(auth, user => {
   if (!user || !user.email.includes('admin')) {
     signOut(auth).then(() => window.location.href = 'login.html');
@@ -31,21 +31,21 @@ onAuthStateChanged(auth, user => {
   loadProducts();
 });
 
-// Выход
+// 2. Выход
 logoutBtn.addEventListener('click', () => {
   signOut(auth).then(() => window.location.href = 'login.html');
 });
 
-// Загрузка товаров
+// 3. Загрузка списка товаров
 async function loadProducts() {
   productsContainer.innerHTML = '<p>Загрузка...</p>';
   try {
     const snapshot = await getDocs(collection(db, 'products'));
+    productsContainer.innerHTML = '';
     if (snapshot.empty) {
       productsContainer.innerHTML = '<p>Нет товаров.</p>';
       return;
     }
-    productsContainer.innerHTML = '';
     snapshot.forEach(docSnap => {
       const p = docSnap.data();
       const div = document.createElement('div');
@@ -62,31 +62,38 @@ async function loadProducts() {
   }
 }
 
-// Обработка кликов по списку
+// 4. Обработка кликов «Редактировать» / «Удалить»
 productsContainer.addEventListener('click', async e => {
   const id = e.target.dataset.id;
   const action = e.target.dataset.action;
   if (!id || !action) return;
 
   const ref = doc(db, 'products', id);
+
   if (action === 'delete') {
     if (!confirm('Удалить товар?')) return;
     await deleteDoc(ref);
     loadProducts();
   }
+
   if (action === 'edit') {
-    const snap = await ref.get();
-    const data = snap.data();
-    document.getElementById('productId').value = id;
-    document.getElementById('productName').value = data.name;
-    document.getElementById('productPrice').value = data.price;
-    saveBtn.textContent = 'Обновить';
-    cancelBtn.style.display = 'inline';
-    editId = id;
+    try {
+      const snap = await getDoc(ref);
+      if (!snap.exists()) throw new Error('Документ не найден');
+      const data = snap.data();
+      document.getElementById('productId').value = id;
+      document.getElementById('productName').value = data.name;
+      document.getElementById('productPrice').value = data.price;
+      saveBtn.textContent = 'Обновить';
+      cancelBtn.style.display = 'inline';
+      editId = id;
+    } catch (err) {
+      alert('Ошибка загрузки товара: ' + err.message);
+    }
   }
 });
 
-// Отмена редактирования
+// 5. Отмена редактирования
 cancelBtn.addEventListener('click', () => {
   productForm.reset();
   editId = null;
@@ -94,21 +101,27 @@ cancelBtn.addEventListener('click', () => {
   cancelBtn.style.display = 'none';
 });
 
-// Сохранение (добавить или обновить)
+// 6. Сохранение новой или обновлённой записи
 productForm.addEventListener('submit', async e => {
   e.preventDefault();
   const name = document.getElementById('productName').value.trim();
   const price = parseFloat(document.getElementById('productPrice').value);
-  if (!name || isNaN(price)) return alert('Заполните поля корректно');
-
-  if (editId) {
-    await updateDoc(doc(db, 'products', editId), { name, price });
-  } else {
-    await addDoc(collection(db, 'products'), { name, price, createdAt: serverTimestamp() });
+  if (!name || isNaN(price)) {
+    return alert('Введите корректные название и цену');
   }
-  productForm.reset();
-  editId = null;
-  saveBtn.textContent = 'Сохранить';
-  cancelBtn.style.display = 'none';
-  loadProducts();
+
+  try {
+    if (editId) {
+      await updateDoc(doc(db, 'products', editId), { name, price });
+    } else {
+      await addDoc(collection(db, 'products'), { name, price, createdAt: serverTimestamp() });
+    }
+    productForm.reset();
+    editId = null;
+    saveBtn.textContent = 'Сохранить';
+    cancelBtn.style.display = 'none';
+    loadProducts();
+  } catch (err) {
+    alert('Ошибка сохранения: ' + err.message);
+  }
 });
