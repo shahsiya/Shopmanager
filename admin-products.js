@@ -96,28 +96,31 @@ productsContainer.addEventListener('click', async e => {
   }
 
   if (action === 'edit') {
-    try {
-      const snap = await getDoc(ref);
-      if (!snap.exists()) throw new Error('Товар не найден');
-      const data = snap.data();
-      existingImageUrl = data.imageUrl || '';
-   // Заполняем форму
-document.getElementById('productId').value    = id || '';
-document.getElementById('productName').value  = data.name || '';
-document.getElementById('productSKU').value   = data.sku || '';
-document.getElementById('productPrice').value = data.price !== undefined ? data.price : '';
-document.getElementById('productStock').value = data.stock !== undefined ? data.stock : '';
+  try {
+    const snap = await getDoc(ref);
+    if (!snap.exists()) throw new Error('Товар не найден');
+    const data = snap.data();
+    existingImageUrl = data.imageUrl || '';
 
-// Скрыть файл, но сохраним старый URL:
-saveBtn.textContent = 'Обновить';
+    // Заполняем форму
+    document.getElementById('productId').value    = id || '';
+    document.getElementById('productName').value  = data.name || '';
+    document.getElementById('productSKU').value   = data.sku || '';
+    document.getElementById('productPrice').value = data.price !== undefined ? data.price : '';
+    document.getElementById('productStock').value = data.stock !== undefined ? data.stock : '';
 
-      cancelBtn.style.display = 'inline';
-      editId = id;
-    } catch (err) {
-      console.error('Ошибка getDoc при редактировании:', err);
-      alert('Ошибка при загрузке товара для редактирования');
-    }
+    // Показываем форму, если была скрыта
+    productForm.style.display = 'block';
+
+    saveBtn.textContent = 'Обновить';
+    cancelBtn.style.display = 'inline';
+    editId = id;
+  } catch (err) {
+    console.error('Ошибка getDoc при редактировании:', err);
+    alert('Ошибка при загрузке товара для редактирования');
   }
+}
+
 });
 
 // 5. Отмена редактирования
