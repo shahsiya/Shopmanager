@@ -4,10 +4,10 @@ import { getAuth, signInWithEmailAndPassword, signOut as firebaseSignOut, onAuth
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBYSoT1yJgt0upA08gkeZoq-FLI0kmqjYk",
+   apiKey: "AIzaSyBYSoT1yJgt0upA08gkeZoq-FLI0kmqjYk",
   authDomain: "shopmanager-c9f0b.firebaseapp.com",
   projectId: "shopmanager-c9f0b",
-  storageBucket: "shopmanager-c9f0b.appspot.com",
+  storageBucket: "shopmanager-c9f0b.firebasestorage.app",
   messagingSenderId: "1029319736818",
   appId: "1:1029319736818:web:bbfb48553e318955ec3f6b"
 };
