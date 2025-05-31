@@ -59,20 +59,20 @@ async function loadProducts() {
       const p = docSnap.data();
       const div = document.createElement('div');
       div.className = 'product-card';
-      div.innerHTML = `
+      div.innerHTML = 
         <h3>${p.name}</h3>
         <p><b>SKU:</b> ${p.sku}</p>
         <p><b>Цена:</b> ${p.price} ₽</p>
         <p><b>В наличии:</b> ${p.stock} шт.</p>
-        ${p.imageUrl ? `<img src="${p.imageUrl}" width="100" style="display:block; margin-top:8px;">` : ''}
+        ${p.imageUrl ? <img src="${p.imageUrl}" width="100" style="display:block; margin-top:8px;"> : ''}
         <button data-id="${docSnap.id}" data-action="edit">Редактировать</button>
         <button data-id="${docSnap.id}" data-action="delete">Удалить</button>
-      `;
+      ;
       productsContainer.appendChild(div);
     });
   } catch (e) {
     console.error('Ошибка loadProducts:', e);
-    productsContainer.innerHTML = `<p>Ошибка: ${e.message}</p>`;
+    productsContainer.innerHTML = <p>Ошибка: ${e.message}</p>;
   }
 }
 
@@ -96,31 +96,28 @@ productsContainer.addEventListener('click', async e => {
   }
 
   if (action === 'edit') {
-  try {
-    const snap = await getDoc(ref);
-    if (!snap.exists()) throw new Error('Товар не найден');
-    const data = snap.data();
-    existingImageUrl = data.imageUrl || '';
+    try {
+      const snap = await getDoc(ref);
+      if (!snap.exists()) throw new Error('Товар не найден');
+      const data = snap.data();
+      existingImageUrl = data.imageUrl || '';
+   // Заполняем форму
+document.getElementById('productId').value    = id || '';
+document.getElementById('productName').value  = data.name || '';
+document.getElementById('productSKU').value   = data.sku || '';
+document.getElementById('productPrice').value = data.price !== undefined ? data.price : '';
+document.getElementById('productStock').value = data.stock !== undefined ? data.stock : '';
 
-    // Заполняем форму
-    document.getElementById('productId').value    = id || '';
-    document.getElementById('productName').value  = data.name || '';
-    document.getElementById('productSKU').value   = data.sku || '';
-    document.getElementById('productPrice').value = data.price !== undefined ? data.price : '';
-    document.getElementById('productStock').value = data.stock !== undefined ? data.stock : '';
+// Скрыть файл, но сохраним старый URL:
+saveBtn.textContent = 'Обновить';
 
-    // Показываем форму, если была скрыта
-    productForm.style.display = 'block';
-
-    saveBtn.textContent = 'Обновить';
-    cancelBtn.style.display = 'inline';
-    editId = id;
-  } catch (err) {
-    console.error('Ошибка getDoc при редактировании:', err);
-    alert('Ошибка при загрузке товара для редактирования');
+      cancelBtn.style.display = 'inline';
+      editId = id;
+    } catch (err) {
+      console.error('Ошибка getDoc при редактировании:', err);
+      alert('Ошибка при загрузке товара для редактирования');
+    }
   }
-}
-
 });
 
 // 5. Отмена редактирования
@@ -150,7 +147,7 @@ productForm.addEventListener('submit', async e => {
   if (file) {
     console.log('Начинаем загрузку файла:', file.name);
     try {
-      const imgRef = storageRef(storage, `products/${Date.now()}_${file.name}`);
+      const imgRef = storageRef(storage, products/${Date.now()}_${file.name});
       await uploadBytes(imgRef, file);
       imageUrl = await getDownloadURL(imgRef);
       console.log('Файл загружен, URL:', imageUrl);
@@ -197,3 +194,5 @@ productForm.addEventListener('submit', async e => {
     alert('Ошибка при сохранении товара');
   }
 });
+
+
