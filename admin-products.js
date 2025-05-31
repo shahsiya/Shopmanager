@@ -101,14 +101,16 @@ productsContainer.addEventListener('click', async e => {
       if (!snap.exists()) throw new Error('Товар не найден');
       const data = snap.data();
       existingImageUrl = data.imageUrl || '';
-      // Заполняем форму
-      document.getElementById('productId').value    = id;
-      document.getElementById('productName').value  = data.name;
-      document.getElementById('productSKU').value   = data.sku;
-      document.getElementById('productPrice').value = data.price;
-      document.getElementById('productStock').value = data.stock;
-      // Скрыть файл, но сохраним старый URL:
-      saveBtn.textContent = 'Обновить';
+   // Заполняем форму
+document.getElementById('productId').value    = id || '';
+document.getElementById('productName').value  = data.name || '';
+document.getElementById('productSKU').value   = data.sku || '';
+document.getElementById('productPrice').value = data.price !== undefined ? data.price : '';
+document.getElementById('productStock').value = data.stock !== undefined ? data.stock : '';
+
+// Скрыть файл, но сохраним старый URL:
+saveBtn.textContent = 'Обновить';
+
       cancelBtn.style.display = 'inline';
       editId = id;
     } catch (err) {
