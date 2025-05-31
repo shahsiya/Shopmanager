@@ -59,20 +59,20 @@ async function loadProducts() {
       const p = docSnap.data();
       const div = document.createElement('div');
       div.className = 'product-card';
-      div.innerHTML = 
+      div.innerHTML = `
         <h3>${p.name}</h3>
         <p><b>SKU:</b> ${p.sku}</p>
         <p><b>Цена:</b> ${p.price} ₽</p>
         <p><b>В наличии:</b> ${p.stock} шт.</p>
-        ${p.imageUrl ? <img src="${p.imageUrl}" width="100" style="display:block; margin-top:8px;"> : ''}
+        ${p.imageUrl ? `<img src="${p.imageUrl}" width="100" style="display:block; margin-top:8px;">` : ''}
         <button data-id="${docSnap.id}" data-action="edit">Редактировать</button>
         <button data-id="${docSnap.id}" data-action="delete">Удалить</button>
-      ;
+      `;
       productsContainer.appendChild(div);
     });
   } catch (e) {
     console.error('Ошибка loadProducts:', e);
-    productsContainer.innerHTML = <p>Ошибка: ${e.message}</p>;
+    productsContainer.innerHTML = `<p>Ошибка: ${e.message}</p>`;
   }
 }
 
@@ -147,7 +147,7 @@ productForm.addEventListener('submit', async e => {
   if (file) {
     console.log('Начинаем загрузку файла:', file.name);
     try {
-      const imgRef = storageRef(storage, products/${Date.now()}_${file.name});
+      const imgRef = storageRef(storage, `products/${Date.now()}_${file.name}`);
       await uploadBytes(imgRef, file);
       imageUrl = await getDownloadURL(imgRef);
       console.log('Файл загружен, URL:', imageUrl);
@@ -194,5 +194,3 @@ productForm.addEventListener('submit', async e => {
     alert('Ошибка при сохранении товара');
   }
 });
-
-
