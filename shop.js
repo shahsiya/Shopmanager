@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js';
 import {
-  getFirestore, collection, addDoc, serverTimestamp
+  getFirestore, collection, addDoc, getDocs, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js';
 import {
   getAuth, onAuthStateChanged
@@ -13,52 +13,72 @@ const firebaseConfig = {
   projectId: "shopmanager-c9f0b",
   storageBucket: "shopmanager-c9f0b.appspot.com",
   messagingSenderId: "1029319736818",
-  appId: "1:1029319736818:web:bbfb48553e318955ec3f6b
+  appId: "1:1029319736818:web:bbfb48553e318955ec3f6b"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const products = [
-  { name: "Товар 1", description: "Описание товара 1" },
-  { name: "Товар 2", description: "Описание товара 2" },
-  { name: "Товар 3", description: "Описание товара 3" }
-];
-
 const productList = document.getElementById('productList');
 
-products.forEach(product => {
-  const div = document.createElement('div');
-  div.className = 'product';
-  div.innerHTML = `
-    <h3>${product.name}</h3>
-    <p>${product.description}</p>
-    <button>Оформить заказ</button>
-  `;
+async function loadProducts() {
+  productList.innerHTML = 'Загрузка товаров...';
 
-  div.querySelector('button').addEventListener('click', () => {
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        alert("Пожалуйста, войдите в систему");
-        window.location.href = "login.html";
-        return;
-      }
+  try {
+    const querySnapshot = await getDocs(collection(db, 'products'));
+    productList.innerHTML = '';
 
-      try {
-        await addDoc(collection(db, 'clients', user.email, 'orders'), {
-          product: product.name,
-          status: 'Ожидает обработки',
-          createdAt: serverTimestamp()
+    if (querySnapshot.empty) {
+      productList.innerHTML = '<p>Товары отсутствуют.</p>';
+      return;
+    }
+
+    querySnapshot.forEach(docSnap => {
+      const product = docSnap.data();
+
+      const div = document.createElement('div');
+      div.className = 'product';
+      div.innerHTML = `
+        <h3>${product.name}</h3>
+        <p>SKU: ${product.sku || ''}</p>
+        <p>Цена: ${product.price} ₽</p>
+        <p>В наличии: ${product.stock} шт.</p>
+        ${product.imageUrl ? `<img src="${product.imageUrl}" width="100" />` : ''}
+        <button>Оформить заказ</button>
+      `;
+
+      div.querySelector('button').addEventListener('click', () => {
+        onAuthStateChanged(auth, async (user) => {
+          if (!user) {
+            alert("Пожалуйста, войдите в систему");
+            window.location.href = "login.html";
+            return;
+          }
+
+          try {
+            await addDoc(collection(db, 'clients', user.email, 'orders'), {
+              product: product.name,
+              status: 'Ожидает обработки',
+              createdAt: serverTimestamp()
+            });
+            alert("Заказ успешно оформлен!");
+            window.location.href = 'client-dashboard.html';
+          } catch (error) {
+            console.error("Ошибка при оформлении заказа", error);
+            alert("Ошибка при заказе");
+          }
         });
-        alert("Заказ успешно оформлен!");
-        window.location.href = 'client-dashboard.html';
-      } catch (error) {
-        console.error("Ошибка при оформлении заказа", error);
-        alert("Ошибка при заказе");
-      }
-    });
-  });
+      });
 
-  productList.appendChild(div);
-});
+      productList.appendChild(div);
+    });
+
+  } catch (err) {
+    productList.innerHTML = `<p>Ошибка загрузки товаров: ${err.message}</p>`;
+    console.error(err);
+  }
+}
+
+// Запускаем загрузку товаров при загрузке страницы
+loadProducts();
