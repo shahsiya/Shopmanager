@@ -49,25 +49,24 @@ async function loadProducts() {
       `;
 
       div.querySelector('button').addEventListener('click', () => {
-        onAuthStateChanged(auth, async (user) => {
-          if (!user) {
-            alert("Пожалуйста, войдите в систему");
-            window.location.href = "login.html";
-            return;
-          }
+        const user = auth.currentUser;
 
-          try {
-            await addDoc(collection(db, 'clients', user.email, 'orders'), {
-              product: product.name,
-              status: 'Ожидает обработки',
-              createdAt: serverTimestamp()
-            });
-            alert("Заказ успешно оформлен!");
-            window.location.href = 'client-dashboard.html';
-          } catch (error) {
-            console.error("Ошибка при оформлении заказа", error);
-            alert("Ошибка при заказе");
-          }
+        if (!user) {
+          alert("Пожалуйста, войдите в систему");
+          window.location.href = "login.html";
+          return;
+        }
+
+        addDoc(collection(db, 'clients', user.email, 'orders'), {
+          product: product.name,
+          status: 'Ожидает обработки',
+          createdAt: serverTimestamp()
+        }).then(() => {
+          alert("Заказ успешно оформлен!");
+          window.location.href = 'client-dashboard.html';
+        }).catch((error) => {
+          console.error("Ошибка при оформлении заказа", error);
+          alert("Ошибка при заказе");
         });
       });
 
